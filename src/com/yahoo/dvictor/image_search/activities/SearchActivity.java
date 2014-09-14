@@ -8,7 +8,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -139,7 +142,11 @@ public class SearchActivity extends Activity {
 	 * 			>0: assumed to be existing search, additional results added.
 	 */
 	private void search(final int page){
-		Log.d("SEARCH","page="+page);
+		// If no network currently, just toast the user to let them know, but don't clear where they are so they can continue later.
+		if(!isNetworkAvailable()){
+			Toast.makeText(this, "Internet Not Available", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		String query = etSearch.getText().toString();
 		//Toast.makeText(this, "Searching: "+query, Toast.LENGTH_SHORT).show();
 		AsyncHttpClient client = new AsyncHttpClient();
@@ -208,6 +215,12 @@ public class SearchActivity extends Activity {
     			Toast.makeText(this, "Settings Changed", Toast.LENGTH_SHORT).show();
     		}
     	}
+    }
+    
+    private Boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 	
 }
