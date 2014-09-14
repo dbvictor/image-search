@@ -13,7 +13,7 @@
 	    android:layout_alignParentTop="true"
 	    android:layout_toLeftOf="@+id/bSearch"
 	    android:ems="10"
-	    android:hint="@string/search_hint" />
+	    android:hint="@string/search_hint"/>
     
     <Button
         android:id="@+id/bSearch"

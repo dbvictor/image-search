@@ -24,6 +24,7 @@
         android:layout_below="@+id/tvFiltersTitle"
         android:layout_marginTop="16dp"
         android:text="@string/settings_size"
+        android:paddingTop="10dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -33,6 +34,7 @@
         android:layout_alignLeft="@+id/tvFilterSize"
         android:layout_below="@+id/tvFilterSize"
         android:text="@string/settings_color"
+        android:paddingTop="10dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -42,6 +44,7 @@
         android:layout_alignLeft="@+id/tvFilterColor"
         android:layout_below="@+id/tvFilterColor"
         android:text="@string/settings_type"
+        android:paddingTop="10dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -51,6 +54,7 @@
         android:layout_alignLeft="@+id/tvFilterType"
         android:layout_below="@+id/tvFilterType"
         android:text="@string/settings_site"
+        android:paddingTop="10dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <Spinner
