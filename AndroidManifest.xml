@@ -33,7 +33,7 @@
                 android:value="com.yahoo.dvictor.image_search.activities.SearchActivity" />
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.yahoo.dvictor.image_search.activities.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
     </application>

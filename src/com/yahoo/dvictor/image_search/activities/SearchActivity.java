@@ -23,10 +23,10 @@ import android.widget.Toast;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yahoo.dvictor.image_search.R;
-import com.yahoo.dvictor.image_search.SettingsActivity;
 import com.yahoo.dvictor.image_search.adapters.SearchResultsAdapter;
 import com.yahoo.dvictor.image_search.models.SearchFilters;
 import com.yahoo.dvictor.image_search.models.SearchResult;
+import com.yahoo.dvictor.image_search.util.EndlessScrollListener;
 
 public class SearchActivity extends Activity {
 	// Remembered Views (instead of searching for them every time)
@@ -36,6 +36,8 @@ public class SearchActivity extends Activity {
 	private SearchFilters           searchFilters;
 	private ArrayList<SearchResult> searchResults;
 	private SearchResultsAdapter    searchResultsAdapter;
+	// static constants
+	private static final int PAGESIZE = 8;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,15 +67,32 @@ public class SearchActivity extends Activity {
 		});
 		// Create settings
 		searchFilters = new SearchFilters();
-		//NO: - If we just came back from the settings activity, load those results.
-		//NO: SearchFilters searchFilter = (SearchFilters) getIntent().getSerializableExtra("settings");
-		//NO: - otherwise create new settings if not coming from that activity.
-		//NO: if(searchFilters==null) searchFilters = new SearchFilters();
+		//FYI: - If we camef from an external activity with settings, then we would do this.
+		//FYI: SearchFilters searchFilter = (SearchFilters) getIntent().getSerializableExtra("settings");
+		//FYI: - otherwise create new settings if not coming from that activity.
+		//FYI: if(searchFilters==null) searchFilters = new SearchFilters();
+		
+		// Attach endless scroll listener
+		//TODO: Why can't we set this once?  It stops working after you scroll to the end of one result and will never scroll again.  But creating a new listener and setting each time they click search works every time.
+		//NOT HERE: setupEndlessScroll();   Works only once if only set here.  Do this when they click search each time.
 	}
 	
 	private void initRememberedViews(){
 		etSearch = (EditText) findViewById(R.id.etSearch);
 		gvSearch = (GridView) findViewById(R.id.gvSearch);
+	}
+	
+	/** Attach endless scroll listener. */
+	private void setupEndlessScroll(){
+		gvSearch.setOnScrollListener(new EndlessScrollListener() {
+		    @Override
+		    public void onLoadMore(int page, int totalItemsCount) {
+		    	// Triggered only when new data needs to be appended to the list
+		    	// Add whatever code is needed to append new items to your AdapterView
+		        searchMoreResults(page); 
+		        // or searchMoreResults(totalItemsCount); 
+		    }
+        });		
 	}
 
 	@Override
@@ -97,11 +116,35 @@ public class SearchActivity extends Activity {
 	
 	/** Fired whenever Search button clicked, because of the onClick property we set. */
 	public void search(View v){
+		setupEndlessScroll(); // Re-setup endless scroll to reset state with a new scroll listener each time.  TODO Why doesn't this work when only set once in onCreate()?
+		search(0); // Just search from the beginning.
+	}
+	
+	/** Fired when the user scrolls and our endless scroll listener says more results are needed to backfill. */
+	private void searchMoreResults(int page){
+		// Append more data into the adapter
+		//   This method probably sends out a network request and appends new data items to your adapter. 
+		//   Use the offset value and add it as a parameter to your API request to retrieve paginated data.
+		//   Deserialize API response and then construct new objects to append to the adapter
+		search(page); // continue searching from where we left off with a new page.
+	}
+	
+	/**
+	 * Search for image results with the current filter settings for the requested page.
+	 * If first result, page is 0 and existing results cleared.  If page >0, assumed to be
+	 * scrolling for additional pages of results appended to existing.
+	 * @param page
+	 * 			page number to load, assuming constant page size.
+	 * 			0: assumed to be a new search, existing results cleared.
+	 * 			>0: assumed to be existing search, additional results added.
+	 */
+	private void search(final int page){
+		Log.d("SEARCH","page="+page);
 		String query = etSearch.getText().toString();
 		//Toast.makeText(this, "Searching: "+query, Toast.LENGTH_SHORT).show();
 		AsyncHttpClient client = new AsyncHttpClient();
 		// Build Search URL with Filter Parameters
-		String url = buildSearchUrl(query);
+		String url = buildSearchUrl(query,page);
 		Log.d("URL",url);
 		// Do Search
 		client.get(url, new JsonHttpResponseHandler(){
@@ -114,25 +157,29 @@ public class SearchActivity extends Activity {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-				// Display Results
-				searchResults.clear(); // Clear only when new search.
-				// Add directly to adapter so that it wil auto-notify. (otherwise we could add to arrayList and notify the adapter).
-				searchResultsAdapter.addAll(SearchResult.fromJSONArray(searchResultsJSON));
-				Log.i("INFO", searchResults.toString());
+				if(searchResultsJSON!=null){ // Only if we got results, process them
+					// Display Results
+					if(page<=0) searchResultsAdapter.clear(); // Clear only when new search.
+					// Add directly to adapter so that it wil auto-notify. (otherwise we could add to arrayList and notify the adapter).
+					searchResultsAdapter.addAll(SearchResult.fromJSONArray(searchResultsJSON));
+					Log.i("INFO", searchResults.toString());
+				}
 			}
 		});
 	}
 	
 	/** Build the search URL with current filter settings. */
-	private String buildSearchUrl(String query){
+	private String buildSearchUrl(String query, int page){
 		// Build Search URL with Filter Parameters
 		// - ex: https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=android&rsz=8
 		// - if no params: String urlSearch = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q="+query+"&rsz=8";
 		StringBuilder url = new StringBuilder();
 		// - Primary URL
 		url.append("https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=").append(query);
+        // - Start
+		url.append("&start=").append(page*PAGESIZE); // offset = page number x page
 		// - Max size
-		url.append("&rsz=8");
+		url.append("&rsz=").append(PAGESIZE);
 		// - Filters (note we rely on empty string to mean no filter, instead of entirely omitting)
 		// -- size
 		url.append("&imgsz=").append(searchFilters.size);
