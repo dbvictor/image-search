@@ -1,13 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.yahoo.dvictor.image_search.SearchActivity" >
+    tools:context="com.yahoo.dvictor.image_search.SettingsActivity" >
 
     <item
         android:id="@+id/action_settings"
-        android:icon="@drawable/ic_action_settings"
         android:orderInCategory="100"
-        android:showAsAction="always"
-        android:onClick="changeSettings"
+        android:showAsAction="never"
         android:title="@string/action_settings"/>
 
 </menu>

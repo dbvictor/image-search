@@ -18,11 +18,14 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yahoo.dvictor.image_search.R;
+import com.yahoo.dvictor.image_search.SettingsActivity;
 import com.yahoo.dvictor.image_search.adapters.SearchResultsAdapter;
+import com.yahoo.dvictor.image_search.models.SearchFilters;
 import com.yahoo.dvictor.image_search.models.SearchResult;
 
 public class SearchActivity extends Activity {
@@ -30,6 +33,7 @@ public class SearchActivity extends Activity {
 	private EditText etSearch;
 	private GridView gvSearch;
 	// Member Variables & Models
+	private SearchFilters           searchFilters;
 	private ArrayList<SearchResult> searchResults;
 	private SearchResultsAdapter    searchResultsAdapter;
 
@@ -59,6 +63,12 @@ public class SearchActivity extends Activity {
 				startActivity(i);
 			}
 		});
+		// Create settings
+		searchFilters = new SearchFilters();
+		//NO: - If we just came back from the settings activity, load those results.
+		//NO: SearchFilters searchFilter = (SearchFilters) getIntent().getSerializableExtra("settings");
+		//NO: - otherwise create new settings if not coming from that activity.
+		//NO: if(searchFilters==null) searchFilters = new SearchFilters();
 	}
 	
 	private void initRememberedViews(){
@@ -90,23 +100,67 @@ public class SearchActivity extends Activity {
 		String query = etSearch.getText().toString();
 		//Toast.makeText(this, "Searching: "+query, Toast.LENGTH_SHORT).show();
 		AsyncHttpClient client = new AsyncHttpClient();
-		// https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=android&rsz=8
-		String urlSearch = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q="+query+"&rsz=8";
-		client.get(urlSearch, new JsonHttpResponseHandler(){
+		// Build Search URL with Filter Parameters
+		String url = buildSearchUrl(query);
+		Log.d("URL",url);
+		// Do Search
+		client.get(url, new JsonHttpResponseHandler(){
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
 				Log.d("DEBUG", response.toString());
+				// Parse Results
 				JSONArray searchResultsJSON = null; // Set only if parsing succeeds.
 				try {     searchResultsJSON = response.getJSONObject("responseData").getJSONArray("results");
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+				// Display Results
 				searchResults.clear(); // Clear only when new search.
 				// Add directly to adapter so that it wil auto-notify. (otherwise we could add to arrayList and notify the adapter).
 				searchResultsAdapter.addAll(SearchResult.fromJSONArray(searchResultsJSON));
 				Log.i("INFO", searchResults.toString());
 			}
 		});
-		
 	}
+	
+	/** Build the search URL with current filter settings. */
+	private String buildSearchUrl(String query){
+		// Build Search URL with Filter Parameters
+		// - ex: https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=android&rsz=8
+		// - if no params: String urlSearch = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q="+query+"&rsz=8";
+		StringBuilder url = new StringBuilder();
+		// - Primary URL
+		url.append("https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=").append(query);
+		// - Max size
+		url.append("&rsz=8");
+		// - Filters (note we rely on empty string to mean no filter, instead of entirely omitting)
+		// -- size
+		url.append("&imgsz=").append(searchFilters.size);
+		// -- color
+		url.append("&imgcolor=").append(searchFilters.color);
+		// -- type
+		url.append("&imgtype=").append(searchFilters.type);
+		// -- site
+		url.append("&as_sitesearch=").append(searchFilters.site);
+		return url.toString();
+	}
+	
+	/** Method the settings icon calls onClick.  We will launch the settings activity for the user to make changes. */
+	public void changeSettings(MenuItem menuItem){
+		//Toast.makeText(this, "Settings!", Toast.LENGTH_SHORT).show();
+		Intent i = new Intent(this,SettingsActivity.class);
+		i.putExtra("settings", searchFilters);
+		startActivityForResult(i, 1);
+	}
+	
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+    	if(requestCode==1){ // SettingsActivity Result
+    		if(resultCode == RESULT_OK){
+    			searchFilters = (SearchFilters) data.getSerializableExtra("settings");
+    			Toast.makeText(this, "Settings Changed", Toast.LENGTH_SHORT).show();
+    		}
+    	}
+    }
+	
 }

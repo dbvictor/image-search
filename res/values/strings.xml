@@ -8,5 +8,12 @@
     <string name="result_title">Image Title</string>
     <string name="title_activity_view">Full Image</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="settings_title">Advanced Search Options</string>
+    <string name="settings_size">Image Size</string>
+    <string name="settings_color">Color Filter</string>
+    <string name="settings_type">Image Type</string>
+    <string name="settings_site">Site Filter</string>
+    <string name="settings_save_button">Save</string>
 
 </resources>

@@ -25,12 +25,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.yahoo.dvictor.image_search.activities.ViewActivity"
+            android:name=".activities.ViewActivity"
             android:label="@string/title_activity_view"
             android:parentActivityName=".activities.SearchActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yahoo.dvictor.image_search.activities.SearchActivity" />
+        </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" >
         </activity>
     </application>
 

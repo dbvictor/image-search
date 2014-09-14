@@ -1,0 +1,104 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.yahoo.dvictor.image_search.SettingsActivity" >
+
+    <TextView
+        android:id="@+id/tvFiltersTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_title"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvFilterSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvFiltersTitle"
+        android:layout_below="@+id/tvFiltersTitle"
+        android:layout_marginTop="16dp"
+        android:text="@string/settings_size"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/tvFilterColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvFilterSize"
+        android:layout_below="@+id/tvFilterSize"
+        android:text="@string/settings_color"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/tvFilterType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvFilterColor"
+        android:layout_below="@+id/tvFilterColor"
+        android:text="@string/settings_type"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/tvFilterSite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvFilterType"
+        android:layout_below="@+id/tvFilterType"
+        android:text="@string/settings_site"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Spinner
+        android:id="@+id/spFilterSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvFilterSize"
+        android:layout_alignTop="@+id/tvFilterSize"
+        android:layout_toRightOf="@+id/tvFilterType"
+        android:entries="@array/filter_size" />
+
+    <Spinner
+        android:id="@+id/spFilterColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvFilterColor"
+        android:layout_alignLeft="@+id/spFilterSize"
+        android:layout_alignTop="@+id/tvFilterColor"
+        android:entries="@array/filter_color" />
+
+    <Spinner
+        android:id="@+id/spFilterType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvFilterType"
+        android:layout_alignLeft="@+id/spFilterColor"
+        android:layout_alignTop="@+id/tvFilterType"
+        android:entries="@array/filter_type" />
+
+    <EditText
+        android:id="@+id/etFilterSite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvFilterSite"
+        android:layout_below="@+id/tvFilterType"
+        android:layout_toRightOf="@+id/tvFilterSite"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/bFilterSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etFilterSite"
+        android:layout_centerHorizontal="true"
+        android:onClick="save"
+        android:text="@string/settings_save_button" />
+
+</RelativeLayout>
